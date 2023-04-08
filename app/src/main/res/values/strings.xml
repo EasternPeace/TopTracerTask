@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Top Tracer</string>
+    <string name="title_activity_top_tracer_welcome">TopTracerWelcomeActivity</string>
 </resources>
