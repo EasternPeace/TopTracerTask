@@ -14,6 +14,8 @@ data class GiphyRandomResponse(
 data class GiphyData(
     val id: String,
     val url: String,
+    val title: String,
+    val username: String,
     val images: GiphyImages
 )
 

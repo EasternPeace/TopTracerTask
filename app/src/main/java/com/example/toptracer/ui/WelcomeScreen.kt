@@ -1,21 +1,21 @@
-package com.example.toptracer
+package com.example.toptracer.ui
 
-import android.os.Build.VERSION.SDK_INT
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -24,28 +24,14 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.toptracer.helpers.GiphyImageDetails
 import com.example.toptracer.helpers.fetchRandomGif
-import com.example.toptracer.ui.theme.TopTracerTheme
-
-class TopTracerWelcomeActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            TopTracerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    WelcomeScreen()
-                }
-            }
-        }
-    }
-}
 
 @Composable
-fun WelcomeScreen() {
+fun WelcomeScreen(
+    modifier: Modifier = Modifier,
+    onLogoutClicked: () -> Unit
+) {
     Column(
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -60,24 +46,26 @@ fun WelcomeScreen() {
         Text(
             text = "Logout",
             modifier = Modifier
-                .clickable {}
+                .clickable {
+                    onLogoutClicked()
+                }
         )
     }
 }
 
 @Composable
-fun RandomGif() {
+fun RandomGif(modifier: Modifier = Modifier) {
     val apiKey = "vYbi41ARNKCZHJvrZ7IlDdqfCGSb8ZZy"
-    val imageDetails = remember { mutableStateOf<GiphyImageDetails?>(null) }
+    val imageDetails = rememberSaveable { mutableStateOf<GiphyImageDetails?>(null) }
 
     LaunchedEffect(apiKey) {
         imageDetails.value = fetchRandomGif(apiKey)
     }
 
-    imageDetails.value?.let {gif ->
+    imageDetails.value?.let { gif ->
         val imageLoader = ImageLoader.Builder(LocalContext.current)
             .components {
-                if (SDK_INT >= 28) {
+                if (Build.VERSION.SDK_INT >= 28) {
                     add(ImageDecoderDecoder.Factory())
                 } else {
                     add(GifDecoder.Factory())
@@ -89,10 +77,9 @@ fun RandomGif() {
         Image(
             painter = rememberAsyncImagePainter(gif.url, imageLoader),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .padding(16.dp)
+            modifier = modifier
+                .size(200.dp)
+                .clip(RectangleShape)
         )
     }
 }
