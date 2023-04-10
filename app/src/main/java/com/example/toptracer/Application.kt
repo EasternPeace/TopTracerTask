@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.toptracer.ui.WelcomeScreen
+import com.example.toptracer.viewmodel.GifViewModel
 
 enum class AppSection() {
     Login, Welcome
@@ -19,6 +20,7 @@ enum class AppSection() {
 fun Application(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val loginViewModel = viewModel<LoginViewModel>()
+    val gifViewModel = viewModel<GifViewModel>()
 
     Surface(
         modifier.fillMaxWidth()
@@ -37,6 +39,7 @@ fun Application(modifier: Modifier = Modifier) {
             }
             composable(route = AppSection.Welcome.name) {
                 WelcomeScreen(
+                    viewModel = gifViewModel,
                     onLogoutClicked = {
                         navController.navigate(AppSection.Login.name)
                     }

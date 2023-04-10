@@ -27,6 +27,12 @@ data class GiphyImageDetails(
     val url: String
 )
 
+data class GifInfo(
+    val imageDetails: GiphyImageDetails,
+    val title: String,
+    val username: String
+)
+
 interface GiphyApi {
     @GET("v1/gifs/random")
     suspend fun getRandomGif(
@@ -45,13 +51,17 @@ fun createGiphyApiService(): GiphyApi {
 }
 
 
-suspend fun fetchRandomGif(apiKey: String, tag: String = "", rating: String = "g"): GiphyImageDetails? {
+suspend fun fetchRandomGif(apiKey: String, tag: String = "", rating: String = "g"): GifInfo? {
     val giphyApi = createGiphyApiService()
     return try {
         val response = withContext(Dispatchers.IO) {
             giphyApi.getRandomGif(apiKey, tag, rating)
         }
-        response.data.images.fixed_height
+        GifInfo(
+            imageDetails = response.data.images.fixed_height,
+            title = response.data.title,
+            username = response.data.username
+        )
     } catch (e: Exception) {
         null
     }

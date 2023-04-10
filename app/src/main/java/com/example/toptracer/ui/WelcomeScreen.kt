@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +20,11 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import com.example.toptracer.helpers.GiphyImageDetails
-import com.example.toptracer.helpers.fetchRandomGif
+import com.example.toptracer.viewmodel.GifViewModel
 
 @Composable
 fun WelcomeScreen(
+    viewModel: GifViewModel,
     modifier: Modifier = Modifier,
     onLogoutClicked: () -> Unit
 ) {
@@ -35,13 +33,20 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        LaunchedEffect(Unit) {
+            viewModel.getRandomGif()
+        }
+
+
+
         Text(
             text = "Welcome, toptracer!"
         )
-        RandomGif(
-        )
+
+        RandomGif(url = viewModel.url.value)
+
         Text(
-            text = "GifTitle by GifAuthor!"
+            text = "${viewModel.title.value} by ${viewModel.username.value}"
         )
         Text(
             text = "Logout",
@@ -54,32 +59,25 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun RandomGif(modifier: Modifier = Modifier) {
-    val apiKey = "vYbi41ARNKCZHJvrZ7IlDdqfCGSb8ZZy"
-    val imageDetails = rememberSaveable { mutableStateOf<GiphyImageDetails?>(null) }
-
-    LaunchedEffect(apiKey) {
-        imageDetails.value = fetchRandomGif(apiKey)
-    }
-
-    imageDetails.value?.let { gif ->
-        val imageLoader = ImageLoader.Builder(LocalContext.current)
-            .components {
-                if (Build.VERSION.SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
+fun RandomGif(
+    modifier: Modifier = Modifier,
+    url: String
+) {
+    val imageLoader = ImageLoader.Builder(LocalContext.current)
+        .components {
+            if (Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
             }
-            .build()
+        }
+        .build()
 
-
-        Image(
-            painter = rememberAsyncImagePainter(gif.url, imageLoader),
-            contentDescription = null,
-            modifier = modifier
-                .size(200.dp)
-                .clip(RectangleShape)
-        )
-    }
+    Image(
+        painter = rememberAsyncImagePainter(url, imageLoader),
+        contentDescription = null,
+        modifier = modifier
+            .size(200.dp)
+            .clip(RectangleShape)
+    )
 }
