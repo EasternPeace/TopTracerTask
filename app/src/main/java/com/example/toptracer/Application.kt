@@ -1,9 +1,11 @@
 package com.example.toptracer
 
+import LoginViewModel
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,6 +18,7 @@ enum class AppSection() {
 @Composable
 fun Application(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    val loginViewModel = viewModel<LoginViewModel>()
 
     Surface(
         modifier.fillMaxWidth()
@@ -26,6 +29,7 @@ fun Application(modifier: Modifier = Modifier) {
         ) {
             composable(route = AppSection.Login.name) {
                 LoginScreen(
+                    viewModel = loginViewModel,
                     onLoginSuccess = {
                         navController.navigate(AppSection.Welcome.name)
                     }

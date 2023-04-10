@@ -1,10 +1,14 @@
 package com.example.toptracer
 
+import LoginViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,37 +16,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.toptracer.helpers.TopTracerPasswordTransformation
 
+
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var username by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var isPasswordValid by remember { mutableStateOf(false) }
-    var isUsernameEmpty by remember { mutableStateOf(true) }
-    var showDialog by remember { mutableStateOf(false) }
-    var dialogText by remember { mutableStateOf("") }
+    val username by viewModel.username
+    val password by viewModel.password
+
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogText by rememberSaveable { mutableStateOf("") }
 
     Column(
-        modifier = modifier .padding(16.dp).fillMaxSize(),
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        UsernameRow(username = username) { usernameInput ->
-            username = usernameInput
-            isUsernameEmpty = usernameInput.isEmpty()
-        }
-        PasswordRow(password = password) { passwordInput ->
-            password = passwordInput
-            isPasswordValid = passwordInput == "password"
-        }
+        UsernameRow(username = username, onValueChange = viewModel::onUsernameChanged)
+        PasswordRow(password = password, onValueChange = viewModel::onPasswordChanged)
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
-
         ) {
             Text(
                 text = "Forgot Password",
@@ -58,15 +58,13 @@ fun LoginScreen(
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
                     .clickable {
-                        if (isUsernameEmpty) {
-                            showDialog = true
-                            dialogText = "It looks like you forgot to provide a username."
-                        } else if (isPasswordValid) {
-                            onLoginSuccess()
-                        } else {
-                            showDialog = true
-                            dialogText = "The password you provided doesn't match our records."
-                        }
+                        viewModel.login(
+                            onSuccess = onLoginSuccess,
+                            onError = { errorText ->
+                                showDialog = true
+                                dialogText = errorText
+                            }
+                        )
                     }
             )
         }
@@ -75,6 +73,7 @@ fun LoginScreen(
         showDialog = false
     }
 }
+
 
 @Composable
 fun UsernameRow(username: String, onValueChange: (String) -> Unit) {
