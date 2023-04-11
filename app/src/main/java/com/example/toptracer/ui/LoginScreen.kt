@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.toptracer.helpers.TopTracerPasswordTransformation
@@ -45,7 +46,7 @@ fun LoginScreen(
                 .padding(24.dp)
         ) {
             Text(
-                text = "Forgot Password",
+                text = stringResource(R.string.forgot_password),
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
@@ -53,7 +54,7 @@ fun LoginScreen(
             )
 
             Text(
-                text = "Login",
+                text = stringResource(R.string.login),
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
@@ -84,7 +85,7 @@ fun UsernameRow(username: String, onValueChange: (String) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Username",
+            text = stringResource(R.string.username),
             modifier = Modifier.weight(1f)
         )
         TextField(
@@ -105,7 +106,7 @@ fun PasswordRow(password: String, onValueChange: (String) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Password",
+            text = stringResource(R.string.password),
             modifier = Modifier.weight(1f)
         )
         TextField(
@@ -127,7 +128,7 @@ fun ValidationAlert(showDialog: Boolean, dialogText: String, onDismiss: () -> Un
             onDismissRequest = onDismiss,
             title = {
                 Text(
-                    text = "Oops!",
+                    text = stringResource(R.string.oops),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
             },
@@ -135,7 +136,7 @@ fun ValidationAlert(showDialog: Boolean, dialogText: String, onDismiss: () -> Un
             confirmButton = {
                 Button(
                     onClick = onDismiss,
-                    content = { Text("OK") }
+                    content = { Text(text = stringResource(R.string.ok),) }
                 )
             }
         )

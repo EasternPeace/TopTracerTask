@@ -1,19 +1,21 @@
 package com.example.toptracer.ui
 
+import LoginViewModel
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -24,39 +26,47 @@ import com.example.toptracer.viewmodel.GifViewModel
 
 @Composable
 fun WelcomeScreen(
-    viewModel: GifViewModel,
     modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel,
     onLogoutClicked: () -> Unit
 ) {
+    val viewModel = remember { GifViewModel() }
+    val orientation = LocalConfiguration.current.orientation
+
+    LaunchedEffect(orientation) {
+        viewModel.getRandomGif()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LaunchedEffect(Unit) {
-            viewModel.getRandomGif()
-        }
-
 
 
         Text(
             text = "Welcome, toptracer!"
         )
-
-        RandomGif(url = viewModel.url.value)
+        Box(contentAlignment = Alignment.Center) {
+            RandomGif(url = viewModel.url.value)
+            CircularProgressBar(isDisplayed = viewModel.isLoading.value)
+        }
 
         Text(
-            text = "${viewModel.title.value} by ${viewModel.username.value}"
-        )
-        Text(
-            text = "Logout",
-            modifier = Modifier
-                .clickable {
-                    onLogoutClicked()
-                }
+            text = viewModel.prettyTitle.value
         )
     }
+
+    Text(
+        text = "Logout",
+        modifier = Modifier
+            .clickable {
+                loginViewModel.logout() // Clear username and password
+                onLogoutClicked()
+            }
+    )
 }
+
 
 @Composable
 fun RandomGif(
@@ -75,9 +85,20 @@ fun RandomGif(
 
     Image(
         painter = rememberAsyncImagePainter(url, imageLoader),
-        contentDescription = null,
+        contentDescription = "Random Gif",
         modifier = modifier
             .size(200.dp)
             .clip(RectangleShape)
     )
+}
+
+@Composable
+fun CircularProgressBar(
+    isDisplayed: Boolean
+) {
+    if (isDisplayed) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
 }
