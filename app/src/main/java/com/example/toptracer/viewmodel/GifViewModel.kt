@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.toptracer.helpers.RetrofitInstance
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GifViewModel : ViewModel() {
@@ -24,7 +23,7 @@ class GifViewModel : ViewModel() {
     private val _isLoading = mutableStateOf(true)
     val isLoading: State<Boolean> get() = _isLoading
 
-    private fun formatTitle(title: String): Pair<String, String?> {
+    private fun formatTitle(title: String): Pair<String?, String?> {
         val regex = Regex("^(.+) by (.+)$")
         val matchResult = regex.find(title)
 
@@ -32,7 +31,7 @@ class GifViewModel : ViewModel() {
             val (formattedTitle, author) = matchResult.destructured
             Pair(formattedTitle, author)
         } else {
-            Pair(title, null)
+            Pair(null, null)
         }
     }
 
@@ -48,8 +47,10 @@ class GifViewModel : ViewModel() {
                     val (formattedTitle, author) = formatTitle(_title.value)
                     _prettyTitle.value = if (author != null) {
                         "\"$formattedTitle\" by $author"
-                    } else {
+                    } else if (formattedTitle != null){
                         "\"$formattedTitle\""
+                    } else {
+                        "Unnamed GIF by Unnamed!"
                     }
                 } else {
                     /* TODO */

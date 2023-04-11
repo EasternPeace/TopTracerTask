@@ -1,9 +1,7 @@
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.toptracer.R
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {

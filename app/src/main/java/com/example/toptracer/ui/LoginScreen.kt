@@ -1,9 +1,9 @@
-package com.example.toptracer
+package com.example.toptracer.ui
 
 import LoginViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,18 +11,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.toptracer.R
+import com.example.toptracer.helpers.ClickableText
+import com.example.toptracer.helpers.InputRow
 import com.example.toptracer.helpers.TopTracerPasswordTransformation
+import com.example.toptracer.helpers.ValidationAlert
 
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val username by viewModel.username
     val password by viewModel.password
@@ -37,8 +40,18 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        UsernameRow(username = username, onValueChange = viewModel::onUsernameChanged)
-        PasswordRow(password = password, onValueChange = viewModel::onPasswordChanged)
+        InputRow(
+            name = stringResource(id = R.string.username),
+            input = username,
+            onValueChange = viewModel::onUsernameChanged,
+            visualTransformation = VisualTransformation.None
+        )
+        InputRow(
+            name = stringResource(id = R.string.password),
+            input = password,
+            onValueChange = viewModel::onPasswordChanged,
+            visualTransformation = TopTracerPasswordTransformation()
+        )
 
         Row(
             modifier = Modifier
@@ -50,95 +63,26 @@ fun LoginScreen(
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
-                    .clickable {}
+                    .clickable {/* TODO: */ }
             )
 
-            Text(
+            ClickableText(
                 text = stringResource(R.string.login),
                 modifier = Modifier
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
-                    .clickable {
-                        viewModel.login(
-                            onSuccess = onLoginSuccess,
-                            onError = { errorText ->
-                                showDialog = true
-                                dialogText = errorText
-                            }
-                        )
+            ) {
+                viewModel.login(
+                    onSuccess = onLoginSuccess,
+                    onError = { errorText ->
+                        showDialog = true
+                        dialogText = errorText
                     }
-            )
+                )
+            }
         }
     }
     ValidationAlert(showDialog, dialogText) {
         showDialog = false
-    }
-}
-
-
-@Composable
-fun UsernameRow(username: String, onValueChange: (String) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.username),
-            modifier = Modifier.weight(1f)
-        )
-        TextField(
-            value = username,
-            onValueChange = onValueChange,
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
-            modifier = Modifier.weight(3f),
-        )
-    }
-}
-
-@Composable
-fun PasswordRow(password: String, onValueChange: (String) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.password),
-            modifier = Modifier.weight(1f)
-        )
-        TextField(
-            value = password,
-            onValueChange = onValueChange,
-            visualTransformation = TopTracerPasswordTransformation(),
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
-            modifier = Modifier
-                .weight(3f)
-        )
-    }
-}
-
-@Composable
-fun ValidationAlert(showDialog: Boolean, dialogText: String, onDismiss: () -> Unit) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = {
-                Text(
-                    text = stringResource(R.string.oops),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                )
-            },
-            text = { Text(dialogText) },
-            confirmButton = {
-                Button(
-                    onClick = onDismiss,
-                    content = { Text(text = stringResource(R.string.ok),) }
-                )
-            }
-        )
     }
 }
