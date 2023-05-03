@@ -5,10 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,15 +21,11 @@ import com.example.toptracer.helpers.ValidationAlert
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit,
+    loginViewModel: LoginViewModel,
     modifier: Modifier = Modifier,
+    onLoginSuccess: () -> Unit,
 ) {
-    val username by viewModel.username
-    val password by viewModel.password
-
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-    var dialogText by rememberSaveable { mutableStateOf("") }
+    val userUiState by loginViewModel.loginScreenUiState.collectAsState()
 
     Column(
         modifier = modifier
@@ -42,14 +36,14 @@ fun LoginScreen(
     ) {
         InputRow(
             name = stringResource(id = R.string.username),
-            input = username,
-            onValueChange = viewModel::onUsernameChanged,
+            input = loginViewModel.username,
+            onValueChange = { loginViewModel.updateUsername(it) },
             visualTransformation = VisualTransformation.None
         )
         InputRow(
             name = stringResource(id = R.string.password),
-            input = password,
-            onValueChange = viewModel::onPasswordChanged,
+            input = loginViewModel.password,
+            onValueChange = { loginViewModel.updatePassword(it) },
             visualTransformation = TopTracerPasswordTransformation()
         )
 
@@ -72,17 +66,11 @@ fun LoginScreen(
                     .weight(1f)
                     .wrapContentSize(Alignment.Center)
             ) {
-                viewModel.login(
-                    onSuccess = onLoginSuccess,
-                    onError = { errorText ->
-                        showDialog = true
-                        dialogText = errorText
-                    }
-                )
+                loginViewModel.onLoginClicked(onLoginSuccess)
             }
         }
     }
-    ValidationAlert(showDialog, dialogText) {
-        showDialog = false
+    ValidationAlert(userUiState.isError, userUiState.errorText) {
+        loginViewModel.resetErrorState()
     }
 }

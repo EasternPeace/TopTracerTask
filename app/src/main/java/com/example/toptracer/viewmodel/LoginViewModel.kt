@@ -1,38 +1,79 @@
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+import com.example.toptracer.ui.state.LoginScreenUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class LoginViewModel : ViewModel() {
-    private val _username = mutableStateOf("")
-    val username: State<String> get() = _username
+    private val _loginScreenUiState = MutableStateFlow(LoginScreenUiState())
+    val loginScreenUiState: StateFlow<LoginScreenUiState> = _loginScreenUiState.asStateFlow()
 
-    private val _password = mutableStateOf("")
-    val password: State<String> get() = _password
+    var username by mutableStateOf("")
+        private set
 
-    fun onUsernameChanged(newUsername: String) {
-        _username.value = newUsername
+    var password by mutableStateOf("")
+        private set
+
+    fun updateUsername(nameInput: String) {
+        username = nameInput
     }
 
-    fun onPasswordChanged(newPassword: String) {
-        _password.value = newPassword
+    fun updatePassword(passwordInput: String) {
+        password = passwordInput
     }
 
-    fun login(onSuccess: () -> Unit, onError: (String) -> Unit) {
-        viewModelScope.launch {
-            if (_username.value.isEmpty()) {
-                onError("It looks like you forgot to provide a username.")
-            } else if (_password.value == "password") {
-                onSuccess()
-            } else {
-                onError("The password you provided doesn't match our records.")
+    fun onLoginClicked(onSuccessLogin: () -> Unit) {
+        if (validateUsername()) {
+            validatePassword(onSuccessLogin)
+        }
+    }
+
+    private fun validateUsername(): Boolean {
+        return if (username.isEmpty()) {
+            _loginScreenUiState.update { currentState ->
+                currentState.copy(
+                    isError = true,
+                    errorText = "It looks like you forgot to provide a username."
+                )
+            }
+            false
+        } else true
+    }
+
+    private fun validatePassword(onSuccessLogin: () -> Unit) {
+        if (password == "password") {
+            _loginScreenUiState.update { currentState ->
+                currentState.copy(
+                    errorText = ""
+                )
+            }
+            onSuccessLogin.invoke()
+            resetInputFields()
+        } else {
+            _loginScreenUiState.update { currentState ->
+                currentState.copy(
+                    isError = true,
+                    errorText = "The password you provided doesn't match our records."
+                )
             }
         }
     }
 
-    fun logout() {
-        _username.value = ""
-        _password.value = ""
+    fun resetInputFields() {
+        username = ""
+        password = ""
+    }
+
+    fun resetErrorState() {
+        _loginScreenUiState.update { currentState ->
+            currentState.copy(
+                isError = false,
+                errorText = ""
+            )
+        }
     }
 }

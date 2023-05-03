@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.toptracer.ui.LoginScreen
 import com.example.toptracer.ui.WelcomeScreen
+import com.example.toptracer.viewmodel.WelcomeViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -23,6 +24,7 @@ enum class AppSection {
 fun Application(modifier: Modifier = Modifier) {
     val navController = rememberAnimatedNavController()
     val loginViewModel = viewModel<LoginViewModel>()
+    val welcomeViewModel = viewModel<WelcomeViewModel>()
 
     Surface(
         modifier.fillMaxWidth()
@@ -47,7 +49,7 @@ fun Application(modifier: Modifier = Modifier) {
                 },
             ) {
                 LoginScreen(
-                    viewModel = loginViewModel,
+                    loginViewModel = loginViewModel,
                     onLoginSuccess = {
                         navController.navigate(AppSection.Welcome.name)
                     }
@@ -69,7 +71,7 @@ fun Application(modifier: Modifier = Modifier) {
                 },
             ) {
                 WelcomeScreen(
-                    loginViewModel = loginViewModel,
+                    viewModel = welcomeViewModel,
                     onLogoutClicked = {
                         navController.navigate(AppSection.Login.name)
                     }
