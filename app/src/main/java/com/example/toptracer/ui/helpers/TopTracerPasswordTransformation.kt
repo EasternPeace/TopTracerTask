@@ -1,12 +1,14 @@
-package com.example.toptracer.helpers
+package com.example.toptracer.ui.helpers
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 
-
-class TopTracerPasswordTransformation(val mask: Char = '\u2022') : VisualTransformation {
+data class TopTracerPasswordTransformation(
+    private val mask: Char = '•',
+    private val unmaskDelay: Int = 1500
+) : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val transformedText = buildString {
             if (text.text.isNotEmpty()) {
@@ -19,16 +21,5 @@ class TopTracerPasswordTransformation(val mask: Char = '\u2022') : VisualTransfo
             AnnotatedString(transformedText),
             OffsetMapping.Identity
         )
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TopTracerPasswordTransformation) return false
-        if (mask != other.mask) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return mask.hashCode()
     }
 }
