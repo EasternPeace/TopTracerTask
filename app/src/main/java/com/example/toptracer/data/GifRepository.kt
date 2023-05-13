@@ -1,8 +1,5 @@
 package com.example.toptracer.data
 
-import com.example.toptracer.helpers.GifResponse
-import com.example.toptracer.helpers.GiphyApiService
-
 class GifRepository(private val giphyApiService: GiphyApiService) {
     private val apiKey = "k7TXlf0ZIUczzeje9BQ28Bemh5QWZLnk"
 

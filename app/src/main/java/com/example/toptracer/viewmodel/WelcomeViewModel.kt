@@ -4,18 +4,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.toptracer.helpers.RetrofitInstance
+import com.example.toptracer.data.GifRepository
 import com.example.toptracer.ui.state.GifUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WelcomeViewModel : ViewModel() {
-    private val giphyApiService = RetrofitInstance.giphyApiService
-    private val apiKey = "k7TXlf0ZIUczzeje9BQ28Bemh5QWZLnk"
-
+@HiltViewModel
+class WelcomeViewModel @Inject constructor(private val gifRepository: GifRepository) : ViewModel() {
     private val _gifUiState = MutableStateFlow(GifUiState())
     val gifUiState: StateFlow<GifUiState> = _gifUiState.asStateFlow()
     private val _prettyTitle = mutableStateOf("")
@@ -35,14 +35,14 @@ class WelcomeViewModel : ViewModel() {
 
     private suspend fun fetchRandomGif() {
         try {
-            val response = giphyApiService.getRandomGif(apiKey, "", "")
-            if (response.isSuccessful) {
-                val gifObject = response.body()?.data
+            val gifObject = gifRepository.getRandomGif("", "")?.data
+            if (gifObject != null) {
                 updateGifUiState(
-                    url = gifObject?.images?.fixedHeight?.url ?: "",
-                    title = gifObject?.title ?: ""
+                    url = gifObject.images.fixedHeight.url,
+                    title = gifObject.title
                 )
                 updatePrettyTitle(_gifUiState.value.title)
+
             } else {
                 /* TODO */
             }
@@ -86,7 +86,6 @@ class WelcomeViewModel : ViewModel() {
             }
         }
     }
-
 
     fun resetGifState() {
         _gifUiState.update { currentState ->

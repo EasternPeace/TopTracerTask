@@ -1,4 +1,4 @@
-package com.example.toptracer.helpers
+package com.example.toptracer.ui.helpers
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping

@@ -1,4 +1,4 @@
-package com.example.toptracer.helpers
+package com.example.toptracer.data
 
 import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient

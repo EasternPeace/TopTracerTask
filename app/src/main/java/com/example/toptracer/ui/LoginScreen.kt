@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.toptracer.R
 import com.example.toptracer.helpers.ClickableText
 import com.example.toptracer.helpers.InputRow
-import com.example.toptracer.helpers.TopTracerPasswordTransformation
+import com.example.toptracer.ui.helpers.TopTracerPasswordTransformation
 import com.example.toptracer.helpers.ValidationAlert
 
 

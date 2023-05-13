@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+
 class LoginViewModel : ViewModel() {
     private val _loginScreenUiState = MutableStateFlow(LoginScreenUiState())
     val loginScreenUiState: StateFlow<LoginScreenUiState> = _loginScreenUiState.asStateFlow()
